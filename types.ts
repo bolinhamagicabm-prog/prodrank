@@ -4,6 +4,11 @@ export enum CollaboratorType {
   ESTAGIARIO = 'ESTAGIÁRIO'
 }
 
+export enum ErrorType {
+  ERRO_PACOTE = 'ERRO_PACOTE',
+  FALTA = 'FALTA'
+}
+
 export interface Collaborator {
   id: string;
   name: string;
@@ -30,6 +35,7 @@ export interface ProductionError {
   collaboratorId: string;
   date: string;
   quantity: number;
+  type: ErrorType;
 }
 
 export interface RankingEntry {

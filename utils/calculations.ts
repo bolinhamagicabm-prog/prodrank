@@ -1,5 +1,5 @@
 
-import { ProductionLog, ProductionError, RankingEntry, Collaborator, CollaboratorType } from '../types';
+import { ProductionLog, ProductionError, RankingEntry, Collaborator, ErrorType } from '../types';
 
 export const timeToMinutes = (time: string): number => {
   if (!time) return 0;
@@ -15,7 +15,10 @@ export const calculateWorkedMinutes = (log: ProductionLog): number => {
   return Math.max(0, total - totalBreakTime);
 };
 
-export const ERROR_PENALTY = 50;
+export const PENALTIES: Record<ErrorType, number> = {
+  [ErrorType.ERRO_PACOTE]: 50,
+  [ErrorType.FALTA]: 10
+};
 
 export const generateRankings = (
   collaborators: Collaborator[],
@@ -25,12 +28,13 @@ export const generateRankings = (
   const results: Record<string, {
     totalPackages: number;
     totalMinutes: number;
-    totalErrors: number;
+    totalPenalty: number;
+    totalErrorCount: number;
   }> = {};
 
   // Initialize
   collaborators.forEach(c => {
-    results[c.id] = { totalPackages: 0, totalMinutes: 0, totalErrors: 0 };
+    results[c.id] = { totalPackages: 0, totalMinutes: 0, totalPenalty: 0, totalErrorCount: 0 };
   });
 
   // Aggregate Logs
@@ -41,19 +45,20 @@ export const generateRankings = (
     }
   });
 
-  // Aggregate Errors
+  // Aggregate Errors with specific penalties
   errors.forEach(err => {
     if (results[err.collaboratorId]) {
-      results[err.collaboratorId].totalErrors += err.quantity;
+      const penaltyValue = PENALTIES[err.type] || 0;
+      results[err.collaboratorId].totalPenalty += (err.quantity * penaltyValue);
+      results[err.collaboratorId].totalErrorCount += err.quantity;
     }
   });
 
   return collaborators.map(c => {
-    const data = results[c.id] || { totalPackages: 0, totalMinutes: 0, totalErrors: 0 };
-    const netPackages = Math.max(0, data.totalPackages - (data.totalErrors * ERROR_PENALTY));
+    const data = results[c.id] || { totalPackages: 0, totalMinutes: 0, totalPenalty: 0, totalErrorCount: 0 };
+    const netPackages = Math.max(0, data.totalPackages - data.totalPenalty);
     
     // Minuto por pacote: tempo total / pacotes líquidos
-    // Se não produziu nada, o tempo é considerado "Infinito" para o ranking
     const mpk = netPackages > 0 ? data.totalMinutes / netPackages : Infinity;
 
     return {
@@ -62,12 +67,11 @@ export const generateRankings = (
       type: c.type,
       totalPackages: data.totalPackages,
       netPackages,
-      totalErrors: data.totalErrors,
+      totalErrors: data.totalErrorCount,
       totalMinutes: data.totalMinutes,
       minutesPerPackage: mpk
     };
   }).sort((a, b) => {
-    // No ranking de "tempo por peça", o MENOR valor é o MELHOR
     if (a.minutesPerPackage === b.minutesPerPackage) return 0;
     return a.minutesPerPackage - b.minutesPerPackage;
   });

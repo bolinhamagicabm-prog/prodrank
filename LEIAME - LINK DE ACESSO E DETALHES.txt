@@ -1,0 +1,16 @@
+git config --global user.name "Bolinha Magica"
+git config --global user.email "bolinhamagica.bm@gmail.COM"
+
+
+
+https://prodrank-h99rupj51-camilo-marques-projects.vercel.app/           ------ LINK DE ACESSO
+
+
+APP FEITO NO GOOGLE IA
+
+ORIENTAÇÕES PARA INSTALAÇÃO NO GIT HUB E VERCEL NO GPT DA BOLINHA NO DIA 3/1
+
+
+GIT HUB - https://github.com/bolinhamagicabm-prog
+
+VERCEL - https://vercel.com/camilo-marques-projects/prodrank/8MUE4TSLv8MuAfKPnaNw7qsxYbCa
