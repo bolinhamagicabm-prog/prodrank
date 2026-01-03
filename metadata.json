@@ -1,0 +1,5 @@
+{
+  "name": "ProdRank - Sistema de Ranking de Produção",
+  "description": "Um aplicativo profissional para gerenciar a produtividade de colaboradores CLT e Estagiários, calculando pacotes por minuto com sistema de penalidade por erros e rankings mensais.",
+  "requestFramePermissions": []
+}
